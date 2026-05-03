@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const COLORS = [
   { bg: "bg-blue-500", light: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
   { bg: "bg-violet-500", light: "bg-violet-50", text: "text-violet-600", border: "border-violet-100" },
@@ -26,7 +28,7 @@ export default function Dashboard() {
 
   const fetchBoards = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/boards");
+      const res = await axios.get("${API}/api/boards");
       setBoards(res.data);
     } catch {
       toast.error("Failed to load boards");
@@ -40,7 +42,7 @@ export default function Dashboard() {
     if (!newBoardTitle.trim()) return;
     setCreating(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/boards", { title: newBoardTitle });
+      const res = await axios.post("${API}/api/boards", { title: newBoardTitle });
       setBoards([res.data, ...boards]);
       setNewBoardTitle("");
       setShowInput(false);
@@ -55,7 +57,7 @@ export default function Dashboard() {
   const deleteBoard = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`http://localhost:5000/api/boards/${id}`);
+      await axios.delete(`${API}/api/boards/${id}`);
       setBoards(boards.filter(b => b.id !== id));
       toast.success("Board deleted");
     } catch {

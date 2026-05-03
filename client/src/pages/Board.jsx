@@ -4,6 +4,8 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const PRIORITY_STYLES = {
   high: { dot: "bg-red-400", badge: "bg-red-50 text-red-500 border-red-100" },
   medium: { dot: "bg-amber-400", badge: "bg-amber-50 text-amber-500 border-amber-100" },
@@ -32,7 +34,7 @@ export default function Board() {
 
   const fetchBoard = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/boards/${id}`);
+      const res = await axios.get(`${API}/api/boards/${id}`);
       setBoard(res.data);
     } catch {
       toast.error("Failed to load board");
@@ -55,7 +57,7 @@ export default function Board() {
     setBoard(newBoard);
 
     try {
-      await axios.patch(`http://localhost:5000/api/tasks/${draggableId}/move`, {
+      await axios.patch(`${API}/api/tasks/${draggableId}/move`, {
         listId: destination.droppableId, order: destination.index,
       });
     } catch {
@@ -68,7 +70,7 @@ export default function Board() {
     const title = newTaskTitle[listId];
     if (!title?.trim()) return;
     try {
-      const res = await axios.post("http://localhost:5000/api/tasks", { title, listId });
+      const res = await axios.post(`${API}/api/tasks`, { title, listId });
       const newBoard = { ...board };
       newBoard.lists.find(l => l.id === listId).tasks.push(res.data);
       setBoard(newBoard);
@@ -82,7 +84,7 @@ export default function Board() {
 
   const deleteTask = async (taskId, listId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`);
+      await axios.delete(`${API}/api/tasks/${taskId}`);
       const newBoard = { ...board };
       const list = newBoard.lists.find(l => l.id === listId);
       list.tasks = list.tasks.filter(t => t.id !== taskId);
@@ -99,7 +101,7 @@ export default function Board() {
     setSubtasks([]);
     setPrioritySuggestion(null);
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/subtasks", { taskTitle: task.title });
+      const res = await axios.post(`${API}/api/ai/subtasks`, { taskTitle: task.title });
       setSubtasks(res.data.subtasks);
     } catch {
       toast.error("AI unavailable");
@@ -112,7 +114,7 @@ export default function Board() {
     setAiLoading(true);
     setPrioritySuggestion(null);
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/priority", {
+      const res = await axios.post(`${API}/api/ai/priority`, {
         taskTitle: task.title, description: task.description
       });
       setPrioritySuggestion(res.data);

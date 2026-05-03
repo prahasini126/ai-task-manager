@@ -57,7 +57,7 @@ export default function Dashboard() {
   const deleteBoard = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`${API}/api/boards/${id}`);
+      await axios.delete("${API}/api/boards/${id}");
       setBoards(boards.filter(b => b.id !== id));
       toast.success("Board deleted");
     } catch {

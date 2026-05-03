@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = "https://ai-task-manager-hx0o.onrender.com";
 
 const PRIORITY_STYLES = {
   high: { dot: "bg-red-400", badge: "bg-red-50 text-red-500 border-red-100" },
@@ -47,7 +47,6 @@ export default function Board() {
     const { destination, source, draggableId } = result;
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
     const newBoard = { ...board };
     const sourceList = newBoard.lists.find(l => l.id === source.droppableId);
     const destList = newBoard.lists.find(l => l.id === destination.droppableId);
@@ -55,7 +54,6 @@ export default function Board() {
     movedTask.listId = destination.droppableId;
     destList.tasks.splice(destination.index, 0, movedTask);
     setBoard(newBoard);
-
     try {
       await axios.patch(`${API}/api/tasks/${draggableId}/move`, {
         listId: destination.droppableId, order: destination.index,
@@ -134,14 +132,12 @@ export default function Board() {
   return (
     <div style={{ fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}
       className="min-h-screen bg-[#f5f5f7] flex flex-col">
-
-      {/* Navbar */}
       <nav className="bg-white/70 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-10">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate("/dashboard")}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition">
-              <span>←</span> Boards
+              ← Boards
             </button>
             <div className="w-px h-4 bg-gray-200" />
             <h1 className="text-sm font-semibold text-gray-900">{board?.title}</h1>
@@ -156,7 +152,6 @@ export default function Board() {
       </nav>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Board */}
         <div className="flex-1 p-8 overflow-x-auto">
           <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex gap-5 min-w-max items-start">
@@ -164,7 +159,6 @@ export default function Board() {
                 const style = COLUMN_STYLES[i % COLUMN_STYLES.length];
                 return (
                   <div key={list.id} className="w-72 flex flex-col">
-                    {/* Column Header */}
                     <div className="flex items-center justify-between mb-3 px-1">
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${style.accent}`} />
@@ -175,12 +169,9 @@ export default function Board() {
                       </span>
                     </div>
 
-                    {/* Tasks */}
                     <Droppable droppableId={list.id}>
                       {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
+                        <div ref={provided.innerRef} {...provided.droppableProps}
                           className={`flex-1 min-h-20 space-y-2.5 rounded-2xl p-2 transition-colors ${snapshot.isDraggingOver ? "bg-gray-200/50" : ""}`}>
                           {list.tasks.map((task, index) => {
                             const p = PRIORITY_STYLES[task.priority] || PRIORITY_STYLES.medium;
@@ -193,7 +184,7 @@ export default function Board() {
                                     {...provided.dragHandleProps}
                                     onClick={() => { setSelectedTask(task); setSubtasks([]); setPrioritySuggestion(null); }}
                                     className={`bg-white rounded-xl p-4 group cursor-pointer border transition-all duration-150
-                                      ${snapshot.isDragging ? "shadow-xl shadow-black/10 rotate-1 scale-105" : "shadow-sm shadow-black/5 hover:shadow-md hover:shadow-black/5"}
+                                      ${snapshot.isDragging ? "shadow-xl shadow-black/10 rotate-1 scale-105" : "shadow-sm shadow-black/5 hover:shadow-md"}
                                       ${selectedTask?.id === task.id ? "border-blue-300 ring-2 ring-blue-100" : "border-gray-100 hover:border-gray-200"}`}>
                                     <div className="flex items-start justify-between gap-2">
                                       <p className="text-sm font-medium text-gray-800 leading-snug flex-1">{task.title}</p>
@@ -227,7 +218,6 @@ export default function Board() {
                       )}
                     </Droppable>
 
-                    {/* Add Task */}
                     <div className="mt-2 px-2">
                       {addingTo === list.id ? (
                         <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2 shadow-sm">
@@ -262,10 +252,8 @@ export default function Board() {
           </DragDropContext>
         </div>
 
-        {/* AI Panel */}
         {selectedTask && (
           <div className="w-72 bg-white border-l border-gray-100 flex flex-col shadow-xl">
-            {/* Header */}
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
@@ -278,23 +266,14 @@ export default function Board() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
-              {/* Task */}
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                 <p className="text-sm font-medium text-gray-800">{selectedTask.title}</p>
-                {selectedTask.description && (
-                  <p className="text-xs text-gray-400 mt-1">{selectedTask.description}</p>
-                )}
               </div>
 
-              {/* Generate Subtasks */}
               <div>
                 <button onClick={() => generateSubtasks(selectedTask)} disabled={aiLoading}
                   className="w-full bg-black hover:bg-gray-800 disabled:opacity-40 text-white text-sm py-2.5 px-4 rounded-xl font-medium transition flex items-center justify-center gap-2">
-                  {aiLoading ? (
-                    <><span className="animate-spin">◌</span> Thinking...</>
-                  ) : (
-                    <><span>✦</span> Generate Subtasks</>
-                  )}
+                  {aiLoading ? <><span className="animate-spin">◌</span> Thinking...</> : <><span>✦</span> Generate Subtasks</>}
                 </button>
                 {subtasks.length > 0 && (
                   <div className="mt-3 space-y-2">
@@ -309,22 +288,16 @@ export default function Board() {
                 )}
               </div>
 
-              {/* Suggest Priority */}
               <div>
                 <button onClick={() => suggestPriority(selectedTask)} disabled={aiLoading}
                   className="w-full bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 disabled:opacity-40 text-white text-sm py-2.5 px-4 rounded-xl font-medium transition flex items-center justify-center gap-2">
-                  {aiLoading ? (
-                    <><span className="animate-spin">◌</span> Analyzing...</>
-                  ) : (
-                    <><span>◎</span> Suggest Priority</>
-                  )}
+                  {aiLoading ? <><span className="animate-spin">◌</span> Analyzing...</> : <><span>◎</span> Suggest Priority</>}
                 </button>
                 {prioritySuggestion && (
                   <div className="mt-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-gray-500">Suggested priority:</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-lg border font-medium
-                        ${PRIORITY_STYLES[prioritySuggestion.priority]?.badge || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+                      <span className="text-xs text-gray-500">Suggested:</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-lg border font-medium ${PRIORITY_STYLES[prioritySuggestion.priority]?.badge || "bg-gray-100 text-gray-600 border-gray-200"}`}>
                         {prioritySuggestion.priority}
                       </span>
                     </div>

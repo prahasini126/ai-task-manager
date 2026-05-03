@@ -4,15 +4,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = "https://ai-task-manager-hx0o.onrender.com";
 
 const COLORS = [
-  { bg: "bg-blue-500", light: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
-  { bg: "bg-violet-500", light: "bg-violet-50", text: "text-violet-600", border: "border-violet-100" },
-  { bg: "bg-rose-500", light: "bg-rose-50", text: "text-rose-600", border: "border-rose-100" },
-  { bg: "bg-amber-500", light: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" },
-  { bg: "bg-emerald-500", light: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100" },
-  { bg: "bg-cyan-500", light: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-100" },
+  { bg: "bg-blue-500", light: "bg-blue-50", text: "text-blue-600" },
+  { bg: "bg-violet-500", light: "bg-violet-50", text: "text-violet-600" },
+  { bg: "bg-rose-500", light: "bg-rose-50", text: "text-rose-600" },
+  { bg: "bg-amber-500", light: "bg-amber-50", text: "text-amber-600" },
+  { bg: "bg-emerald-500", light: "bg-emerald-50", text: "text-emerald-600" },
+  { bg: "bg-cyan-500", light: "bg-cyan-50", text: "text-cyan-600" },
 ];
 
 export default function Dashboard() {
@@ -28,7 +28,7 @@ export default function Dashboard() {
 
   const fetchBoards = async () => {
     try {
-      const res = await axios.get("${API}/api/boards");
+      const res = await axios.get(`${API}/api/boards`);
       setBoards(res.data);
     } catch {
       toast.error("Failed to load boards");
@@ -42,7 +42,7 @@ export default function Dashboard() {
     if (!newBoardTitle.trim()) return;
     setCreating(true);
     try {
-      const res = await axios.post("${API}/api/boards", { title: newBoardTitle });
+      const res = await axios.post(`${API}/api/boards`, { title: newBoardTitle });
       setBoards([res.data, ...boards]);
       setNewBoardTitle("");
       setShowInput(false);
@@ -57,7 +57,7 @@ export default function Dashboard() {
   const deleteBoard = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.delete("${API}/api/boards/${id}");
+      await axios.delete(`${API}/api/boards/${id}`);
       setBoards(boards.filter(b => b.id !== id));
       toast.success("Board deleted");
     } catch {
@@ -68,8 +68,6 @@ export default function Dashboard() {
   return (
     <div style={{ fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}
       className="min-h-screen bg-[#f5f5f7]">
-
-      {/* Navbar */}
       <nav className="bg-white/70 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -92,7 +90,6 @@ export default function Dashboard() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
-        {/* Header */}
         <div className="flex items-end justify-between mb-10">
           <div>
             <p className="text-sm text-gray-500 mb-1">Good day,</p>
@@ -104,12 +101,10 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Create Board Input */}
         {showInput && (
           <form onSubmit={createBoard}
             className="bg-white rounded-2xl border border-gray-200 p-5 mb-8 flex gap-3 shadow-sm">
-            <input
-              autoFocus
+            <input autoFocus
               className="flex-1 px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition"
               placeholder="Board name..."
               value={newBoardTitle}
@@ -125,7 +120,6 @@ export default function Dashboard() {
           </form>
         )}
 
-        {/* Boards */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1,2,3].map(i => (
@@ -152,11 +146,8 @@ export default function Dashboard() {
                     <div className={`w-10 h-10 ${color.bg} rounded-xl flex items-center justify-center shadow-sm`}>
                       <span className="text-white text-sm font-semibold">{board.title[0].toUpperCase()}</span>
                     </div>
-                    <button
-                      onClick={(e) => deleteBoard(board.id, e)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition text-lg leading-none">
-                      ×
-                    </button>
+                    <button onClick={(e) => deleteBoard(board.id, e)}
+                      className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition text-lg leading-none">×</button>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-1">{board.title}</h3>
                   <p className="text-xs text-gray-400">

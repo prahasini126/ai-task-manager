@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      axios.get("${API}/api/auth/me")
+      axios.get(`${API}/api/auth/me`)
         .then(res => setUser(res.data))
         .catch(() => logout())
         .finally(() => setLoading(false));
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (email, password) => {
-    const res = await axios.post("${API}/api/auth/login", { email, password });
+    const res = await axios.post(`${API}/api/auth/login`, { email, password });
     localStorage.setItem("token", res.data.token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
     setToken(res.data.token);
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
-    const res = await axios.post("${API}/api/auth/register", { name, email, password });
+    const res = await axios.post(`${API}/api/auth/register`, { name, email, password });
     localStorage.setItem("token", res.data.token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
     setToken(res.data.token);

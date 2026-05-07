@@ -2,8 +2,7 @@
 
 A full-stack Kanban board with AI capabilities built with React, Node.js, and PostgreSQL.
 
-🔗 **Live Demo**: [your-vercel-url.vercel.app](https://your-vercel-url.vercel.app)
-
+🔗 **Live Demo**: [ai-task-manager-lovat-seven.vercel.app](https://ai-task-manager-lovat-seven.vercel.app)
 ## ✨ Features
 
 - 🔐 **JWT Authentication** — Secure register/login with bcrypt
